@@ -1,0 +1,73 @@
+/**
+ *  Thermostat Running Windows Open
+ *
+ *  Author: listpope@cox.net
+ */
+definition(
+    name: "Thermostat Running Windows Open",
+    namespace: "pope",
+    author: "Anders Heie",
+    description: "Warns if Nest is running and contacts are open",
+    category: "Green Living",
+    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/temp_thermo.png",
+    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/temp_thermo@2x.png"
+)
+
+preferences {
+	section("Choose thermostat... ") {
+		input "nest", "device.nest"//"capability.thermostat"
+	}
+	section("Heat setting...") {
+		input "contacts", "capability.contactSensor", multiple: true, title: "Select Contacts", required: false
+	}
+}
+
+def installed()
+{
+	subscribe(nest, "activity", activityHandler, [filterEvents: false])
+	subscribe(contacts, "contact.open", contactOpened)
+	subscribe(contacts, "contact.closed", contactClosed)
+}
+
+def updated()
+{
+	unsubscribe()
+	subscribe(nest, "activity", activityHandler, [filterEvents: false])
+	subscribe(contacts, "contact.open", contactOpened)
+	subscribe(contacts, "contact.closed", contactClosed)
+}
+
+def activityHandler(evt)
+{
+	log.debug "activityHandler: Nest is ${evt.value}"
+    
+    if(evt.value == "cooling" || evt.value == "heating") {
+        //device.currentValue("heatingSetpoint")
+        
+        def open = contacts.findAll { it?.latestValue("contact") == "open" }
+        
+        if(open.size() > 0) 
+        {
+	    	sendPush("Nest is ${evt.value} + ${open.size()} Windows/Doors are open")
+		}
+    }
+    
+    
+}
+
+def contactOpened(evt)
+{
+	log.debug "contactOpened: $evt, $settings"
+}
+
+def contactClosed(evt)
+{
+	log.debug "contactClosed: $evt, $settings"
+}
+
+
+// catchall
+def event(evt)
+{
+	log.debug "value: $evt.value, event: $evt, settings: $settings, handlerName: ${evt.handlerName}"
+}

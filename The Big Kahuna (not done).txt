@@ -1,0 +1,124 @@
+/**
+ *  The Big Kahuna
+ *
+ *  Quick app for doing almost anything in a jiffy, without having to write a new app.
+ *
+ *  Author: andersheie@gmail.com
+ *  Date: 2013-10-29
+ */
+
+// Automatically generated. Make future change here.
+definition(
+    name: "The Big Kahuna",
+    namespace: "",
+    author: "andersheie@gmail.com",
+    description: "Does most things, and can replace most apps, with a bit of a complex setup, you can use this for probably 90% of your stuff. Or not. Who knows",
+    category: "My Apps",
+    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
+    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience%402x.png"
+)
+
+preferences {
+	
+	section("WHEN any of these..."){
+		input "Amotion", "capability.motionSensor", title: "Motion Here", required: false, multiple: true
+		input "Acontact", "capability.contactSensor", title: "Contact Opens", required: false, multiple: true
+		input "AcontactClosed", "capability.contactSensor", title: "Contact Closes", required: false, multiple: true
+		input "Aacceleration", "capability.accelerationSensor", title: "Acceleration Detected", required: false, multiple: true
+		input "AmySwitch", "capability.switch", title: "Switch Turned On", required: false, multiple: true
+		input "AmySwitchOff", "capability.switch", title: "Switch Turned Off", required: false, multiple: true
+		input "AarrivalPresence", "capability.presenceSensor", title: "Arrival Of", required: false, multiple: true
+		input "AdeparturePresence", "capability.presenceSensor", title: "Departure Of", required: false, multiple: true
+        input "Aluminance1", "capability.illuminanceMeasurement", title: "Where?", required: false, multiple: true
+		input "Awater", "capability.waterSensor", title: "Water Sensor Wet", required: false, multiple: true
+	}
+    section("AND WHEN any of these..."){
+		input "Bmotion", "capability.motionSensor", title: "Motion Here", required: false, multiple: true
+		input "Bcontact", "capability.contactSensor", title: "Contact Opens", required: false, multiple: true
+		input "BcontactClosed", "capability.contactSensor", title: "Contact Closes", required: false, multiple: true
+		input "Bacceleration", "capability.accelerationSensor", title: "Acceleration Detected", required: false, multiple: true
+		input "BmySwitch", "capability.switch", title: "Switch Turned On", required: false, multiple: true
+		input "BmySwitchOff", "capability.switch", title: "Switch Turned Off", required: false, multiple: true
+		input "BarrivalPresence", "capability.presenceSensor", title: "Arrival Of", required: false, multiple: true
+		input "BdeparturePresence", "capability.presenceSensor", title: "Departure Of", required: false, multiple: true
+        input "Bluminance1", "capability.illuminanceMeasurement", title: "Where?", required: false, multiple: true
+		input "Bwater", "capability.waterSensor", title: "Water Sensor Wet", required: false, multiple: true
+	}
+    section("AND WHEN any of these..."){
+		input "temperatureSensor1", "capability.temperatureMeasurement", title: "Temperature sensors", required: false, multiple: true
+		input "temperature1", "number", title: "Drops below?", required: false
+        input "temperature1", "number", title: "Rises above?", required: false
+	}
+    
+    section("Happens within X minutes of each other") {
+		input "frequency", "decimal", title: "X Minutes", required: false
+	}
+    
+    section("During this time window (default End Time is 4:00 PM)") {
+		input "timeOfDay", "time", title: "Start Time?", required: false
+		input "endTime", "time", title: "End Time?", required: false
+	}
+   
+    section("UNLESS any of these already..."){
+		input "Cmotion", "capability.motionSensor", title: "Motion Here", required: false, multiple: true
+		input "Ccontact", "capability.contactSensor", title: "Contact Opens", required: false, multiple: true
+		input "CcontactClosed", "capability.contactSensor", title: "Contact Closes", required: false, multiple: true
+		input "Cacceleration", "capability.accelerationSensor", title: "Acceleration Detected", required: false, multiple: true
+		input "CmySwitch", "capability.switch", title: "Switch Turned On", required: false, multiple: true
+		input "CmySwitchOff", "capability.switch", title: "Switch Turned Off", required: false, multiple: true
+		input "CarrivalPresence", "capability.presenceSensor", title: "Arrival Of", required: false, multiple: true
+		input "CdeparturePresence", "capability.presenceSensor", title: "Departure Of", required: false, multiple: true
+        input "Cluminance1", "capability.illuminanceMeasurement", title: "Where?", required: false, multiple: true
+		input "Cwater", "capability.waterSensor", title: "Water Sensor Wet", required: false, multiple: true
+	}
+	
+    section("THEN do this to your lights, locks, feeder or mode") {
+		input "DlightsOn", "capability.switch", title: "Turn on switches", multiple: true
+        input "DlightsOff", "capability.switch", title: "Turn off switches", multiple: true
+        input "DlightsToggle", "capability.switch", title: "Toggle switches", multiple: true
+        input "DlocksLock", "capability.lock", title: "Lock locks", multiple: true, required: false
+        input "DlocksUnlock", "capability.lock", title: "Unlock locks", multiple: true, required: false
+        input "DlocksToggle", "capability.lock", title: "Toggle locks", multiple: true, required: false
+        input "feeder", "device.PetFeederShield", title: "Feed my pet", multiple: true, required: false
+        input "newMode", "mode", title: "Change to this mode", required: false
+	}
+    section("AND do this to your thermostats") {
+		input "thermostat", "capability.thermostat", title: "Select Thermostat", multiple: true, required: false
+		input "heatingSetpoint", "decimal", title: "Heating Temp in Deg F", required: false
+		input "coolingSetpoint", "decimal", title: "Air Condition Temp in Deg F", required: false
+	}
+    section("AND do this to your dimmers") {
+        input "dimmers", "capability.switchLevel", title: "Dimmers", description: "Tap to select lights", multiple: true
+        input "frequency", "decimal", title: "Set to this level", required: false
+	}
+
+	section("Send this message (optional, sends standard status message if not specified)"){
+		input "messageText", "text", title: "Message Text", required: false
+	}
+	section("Via a push notification and/or an SMS message"){
+		input "phone", "phone", title: "Phone Number (for SMS, optional)", required: false
+		input "pushAndPhone", "enum", title: "Both Push and SMS?", required: false, metadata: [values: ["Yes","No"]]
+	}
+	section("Minimum time between messages (optional, defaults to every message)") {
+		input "frequency", "decimal", title: "Minutes", required: false
+	}
+}
+
+def installed() {
+	log.debug "Installed with settings: ${settings}"
+
+	initialize()
+}
+
+def updated() {
+	log.debug "Updated with settings: ${settings}"
+
+	unsubscribe()
+	initialize()
+}
+
+def initialize() {
+	// TODO: subscribe to attributes, devices, locations, etc.
+}
+
+// TODO: implement event handlers

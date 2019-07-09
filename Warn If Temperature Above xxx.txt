@@ -1,0 +1,84 @@
+/**
+ *  Warn if Temperature Exceeds 120 F
+ *
+ *  Based on "It's Too Cold" by SmartThings
+ *
+ *  Author: Anders Heie
+ */
+
+// Automatically generated. Make future change here.
+definition(
+    name: "Warn if Temperature Exceeds 120 F",
+    namespace: "",
+    author: "listpope@cox.net",
+    description: "Warn if Temperature Exceeds 120 F, send a message.. Could be used as early-warning for fires. Set notification interval (per device). Great way to utilize all your multi's around the house",
+    category: "Safety & Security",
+    iconUrl: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRgrXP-4hGQ9R1K10fxW2JLrrG7BlFGQfElfjeocMntVeQ55Hy0Maup4zPa",
+    iconX2Url: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRgrXP-4hGQ9R1K10fxW2JLrrG7BlFGQfElfjeocMntVeQ55Hy0Maup4zPa",
+    iconX3Url: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRgrXP-4hGQ9R1K10fxW2JLrrG7BlFGQfElfjeocMntVeQ55Hy0Maup4zPa")
+
+preferences {
+	section("Monitor the temperature...") {
+		input "temperatureSensors", "capability.temperatureMeasurement", multiple: true
+	}
+	section("When the temperature exceeds (default 120 F) ...") {
+		input "temperatureTooHot", "number", title: "Temperature?", required: false
+	}
+	section( "Notifications" ) {
+		input "sendPushMessage", "enum", title: "Send a push notification?", metadata:[values:["Yes","No"]], required:false
+		input "phone", "phone", title: "Send a Text Message?", required: false
+	}
+    section("Minimum time between messages per device (optional, defaults to every message)") {
+		input "frequency", "decimal", title: "Minutes", required: false
+	}
+}
+
+def installed() {
+	subscribe(temperatureSensors, "temperature", temperatureHandler)
+}
+
+def updated() {
+	unsubscribe()
+	subscribe(temperatureSensors, "temperature", temperatureHandler)
+}
+
+def temperatureHandler(evt) {
+	log.trace "temperature: $evt.value, $evt.displayName"
+
+	def toohot = (temperatureTooHot != null && temperatureTooHot != "") ? temperatureTooHot : 120.0
+
+	if (evt.doubleValue >= toohot) {
+		
+        if (frequency) {
+			def lastTime = state[evt.deviceId]
+            log.info lastTime
+			if (lastTime == null || now() - lastTime >= frequency * 60000) {
+				sendMessage(evt, toohot)
+			}
+		} else {
+        	sendMessage(evt, toohot)
+        }
+
+	}
+}
+
+private sendMessage(evt, toohot) {
+	
+    //log.debug "XXXX: $evt.id - $evt.displayName - $evt.device.displayName - $evt.name - $evt.device.name"
+
+	def message = "Temperature Sensor $evt.device.displayName reported: ${evt.value}${evt.unit} > ${toohot} ${evt.unit} in the last ${frequency} minutes"
+    
+    log.debug "Sending: $message"
+        	
+    if(sendPushMessage == "Yes") {
+        sendPush(message);
+        //log.info "SENT PUSH"
+    }
+    
+    if (phone) {
+        sendSms(phone, message)
+    }
+    log.debug message
+    
+	state[evt.deviceId] = now()
+}
